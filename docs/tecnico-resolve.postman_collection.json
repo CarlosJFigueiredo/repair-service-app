@@ -1,0 +1,310 @@
+{
+  "info": {
+    "name": "Técnico Resolve – Sprint 1",
+    "_postman_id": "tecnico-resolve-sprint1",
+    "description": "Coleção de endpoints REST do backend Técnico Resolve (Flask + SQLite). Projeto Integrador LDAMD 2026/1 — Carlos Figueiredo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Usuários",
+      "item": [
+        {
+          "name": "Cadastrar Cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/usuarios/", "host": ["{{base_url}}"], "path": ["api", "usuarios", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Ana Souza\",\n  \"email\": \"ana@email.com\",\n  \"telefone\": \"31999990001\",\n  \"perfil\": \"CLIENTE\"\n}"
+            },
+            "description": "Cadastra um novo usuário com perfil CLIENTE. Campos obrigatórios: nome, email, telefone, perfil."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"nome\": \"Ana Souza\",\n  \"email\": \"ana@email.com\",\n  \"telefone\": \"31999990001\",\n  \"perfil\": \"CLIENTE\",\n  \"especialidade\": null,\n  \"criado_em\": \"2026-05-06 10:00:00\"\n}"
+            },
+            {
+              "name": "400 Campos ausentes",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"Campos obrigatórios ausentes: telefone\"\n}"
+            },
+            {
+              "name": "409 E-mail duplicado",
+              "status": "Conflict",
+              "code": 409,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"E-mail já cadastrado\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cadastrar Técnico",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/usuarios/", "host": ["{{base_url}}"], "path": ["api", "usuarios", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Carlos Silva\",\n  \"email\": \"carlos@tecnico.com\",\n  \"telefone\": \"31999990002\",\n  \"perfil\": \"TECNICO\",\n  \"especialidade\": \"NOTEBOOK\"\n}"
+            },
+            "description": "Cadastra um novo usuário com perfil TECNICO. Campo 'especialidade' é obrigatório para técnicos."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 2,\n  \"nome\": \"Carlos Silva\",\n  \"email\": \"carlos@tecnico.com\",\n  \"telefone\": \"31999990002\",\n  \"perfil\": \"TECNICO\",\n  \"especialidade\": \"NOTEBOOK\",\n  \"criado_em\": \"2026-05-06 10:01:00\"\n}"
+            },
+            {
+              "name": "400 Especialidade ausente",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"especialidade é obrigatória para técnicos\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listar Usuários",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/usuarios/", "host": ["{{base_url}}"], "path": ["api", "usuarios", ""] },
+            "description": "Retorna todos os usuários cadastrados (clientes e técnicos)."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"nome\": \"Ana Souza\",\n    \"email\": \"ana@email.com\",\n    \"telefone\": \"31999990001\",\n    \"perfil\": \"CLIENTE\",\n    \"especialidade\": null,\n    \"criado_em\": \"2026-05-06 10:00:00\"\n  },\n  {\n    \"id\": 2,\n    \"nome\": \"Carlos Silva\",\n    \"email\": \"carlos@tecnico.com\",\n    \"telefone\": \"31999990002\",\n    \"perfil\": \"TECNICO\",\n    \"especialidade\": \"NOTEBOOK\",\n    \"criado_em\": \"2026-05-06 10:01:00\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Buscar Usuário por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/usuarios/1", "host": ["{{base_url}}"], "path": ["api", "usuarios", "1"] },
+            "description": "Retorna os dados de um usuário específico pelo seu ID."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"nome\": \"Ana Souza\",\n  \"email\": \"ana@email.com\",\n  \"telefone\": \"31999990001\",\n  \"perfil\": \"CLIENTE\",\n  \"especialidade\": null,\n  \"criado_em\": \"2026-05-06 10:00:00\"\n}"
+            },
+            {
+              "name": "404 Não encontrado",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"Usuário não encontrado\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chamados",
+      "item": [
+        {
+          "name": "Abrir Chamado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/chamados/", "host": ["{{base_url}}"], "path": ["api", "chamados", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente_id\": 1,\n  \"tipo_servico\": \"NOTEBOOK\",\n  \"descricao\": \"Notebook não liga após queda. Tela apagada e sem resposta.\"\n}"
+            },
+            "description": "Abre um novo chamado de suporte. Apenas usuários com perfil CLIENTE podem abrir chamados. tipo_servico: CELULAR | NOTEBOOK | INTERNET | OUTRO."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"cliente_id\": 1,\n  \"tecnico_id\": null,\n  \"tipo_servico\": \"NOTEBOOK\",\n  \"descricao\": \"Notebook não liga após queda. Tela apagada e sem resposta.\",\n  \"status\": \"ABERTO\",\n  \"criado_em\": \"2026-05-06 10:05:00\",\n  \"atualizado_em\": \"2026-05-06 10:05:00\"\n}"
+            },
+            {
+              "name": "403 Perfil inválido",
+              "status": "Forbidden",
+              "code": 403,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"Apenas usuários com perfil CLIENTE podem abrir chamados\"\n}"
+            },
+            {
+              "name": "400 Tipo de serviço inválido",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"tipo_servico deve ser um de: CELULAR, NOTEBOOK, INTERNET, OUTRO\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listar Chamados",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/chamados/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chamados", ""],
+              "query": [{ "key": "status", "value": "ABERTO", "disabled": true }]
+            },
+            "description": "Lista todos os chamados. Aceita filtro opcional por status via query param: ?status=ABERTO | ACEITO | EM_ANDAMENTO | CONCLUIDO | RECUSADO."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"cliente_id\": 1,\n    \"tecnico_id\": null,\n    \"tipo_servico\": \"NOTEBOOK\",\n    \"descricao\": \"Notebook não liga após queda.\",\n    \"status\": \"ABERTO\",\n    \"criado_em\": \"2026-05-06 10:05:00\",\n    \"atualizado_em\": \"2026-05-06 10:05:00\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Buscar Chamado por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/chamados/1", "host": ["{{base_url}}"], "path": ["api", "chamados", "1"] },
+            "description": "Retorna os dados de um chamado específico pelo seu ID."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"cliente_id\": 1,\n  \"tecnico_id\": null,\n  \"tipo_servico\": \"NOTEBOOK\",\n  \"descricao\": \"Notebook não liga após queda.\",\n  \"status\": \"ABERTO\",\n  \"criado_em\": \"2026-05-06 10:05:00\",\n  \"atualizado_em\": \"2026-05-06 10:05:00\"\n}"
+            },
+            {
+              "name": "404 Não encontrado",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"Chamado não encontrado\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Aceitar Chamado",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/chamados/1/status", "host": ["{{base_url}}"], "path": ["api", "chamados", "1", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACEITO\",\n  \"tecnico_id\": 2\n}"
+            },
+            "description": "Técnico aceita um chamado ABERTO. Requer tecnico_id de um usuário com perfil TECNICO."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"cliente_id\": 1,\n  \"tecnico_id\": 2,\n  \"tipo_servico\": \"NOTEBOOK\",\n  \"descricao\": \"Notebook não liga após queda.\",\n  \"status\": \"ACEITO\",\n  \"criado_em\": \"2026-05-06 10:05:00\",\n  \"atualizado_em\": \"2026-05-06 10:10:00\"\n}"
+            },
+            {
+              "name": "422 Transição inválida",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"Transição inválida: CONCLUIDO → ACEITO\",\n  \"transicoes_permitidas\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Recusar Chamado",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/chamados/1/status", "host": ["{{base_url}}"], "path": ["api", "chamados", "1", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"RECUSADO\"\n}"
+            },
+            "description": "Técnico recusa um chamado ABERTO ou ACEITO."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"cliente_id\": 1,\n  \"tecnico_id\": null,\n  \"tipo_servico\": \"NOTEBOOK\",\n  \"descricao\": \"Notebook não liga após queda.\",\n  \"status\": \"RECUSADO\",\n  \"criado_em\": \"2026-05-06 10:05:00\",\n  \"atualizado_em\": \"2026-05-06 10:12:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Iniciar Atendimento (EM_ANDAMENTO)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/chamados/1/status", "host": ["{{base_url}}"], "path": ["api", "chamados", "1", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"EM_ANDAMENTO\"\n}"
+            },
+            "description": "Técnico inicia o atendimento de um chamado ACEITO."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"cliente_id\": 1,\n  \"tecnico_id\": 2,\n  \"tipo_servico\": \"NOTEBOOK\",\n  \"descricao\": \"Notebook não liga após queda.\",\n  \"status\": \"EM_ANDAMENTO\",\n  \"criado_em\": \"2026-05-06 10:05:00\",\n  \"atualizado_em\": \"2026-05-06 10:15:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Concluir Chamado",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/chamados/1/status", "host": ["{{base_url}}"], "path": ["api", "chamados", "1", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONCLUIDO\"\n}"
+            },
+            "description": "Técnico conclui um chamado EM_ANDAMENTO."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"cliente_id\": 1,\n  \"tecnico_id\": 2,\n  \"tipo_servico\": \"NOTEBOOK\",\n  \"descricao\": \"Notebook não liga após queda.\",\n  \"status\": \"CONCLUIDO\",\n  \"criado_em\": \"2026-05-06 10:05:00\",\n  \"atualizado_em\": \"2026-05-06 10:30:00\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

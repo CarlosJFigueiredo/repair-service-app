@@ -21,3 +21,10 @@ def listar():
 def buscar(usuario_id):
     resultado, status = service.buscar_por_id(usuario_id)
     return jsonify(resultado), status
+
+
+@usuario_bp.post("/login")
+def login():
+    dados = request.get_json(silent=True) or {}
+    resultado, status = service.login(dados)
+    return jsonify(resultado), status

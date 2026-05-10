@@ -10,6 +10,7 @@ class Usuario:
     telefone: str
     perfil: str          # 'CLIENTE' | 'TECNICO'
     especialidade: Optional[str]
+    senha: str
     criado_em: Optional[str]
 
     def to_dict(self) -> dict:

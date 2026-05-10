@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     telefone     TEXT    NOT NULL,
     perfil       TEXT    NOT NULL CHECK (perfil IN ('CLIENTE', 'TECNICO')),
     especialidade TEXT,
+    senha        TEXT    NOT NULL,
     criado_em    TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 

@@ -12,7 +12,8 @@ def _row_to_usuario(row) -> Usuario:
         telefone=row[3],
         perfil=row[4],
         especialidade=row[5],
-        criado_em=row[6],
+        senha=row[6],
+        criado_em=row[7],
     )
 
 
@@ -26,10 +27,10 @@ def criar(usuario: Usuario) -> Usuario:
     with _conn() as conn:
         cur = conn.execute(
             """
-            INSERT INTO usuarios (nome, email, telefone, perfil, especialidade)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO usuarios (nome, email, telefone, perfil, especialidade, senha)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (usuario.nome, usuario.email, usuario.telefone, usuario.perfil, usuario.especialidade),
+            (usuario.nome, usuario.email, usuario.telefone, usuario.perfil, usuario.especialidade, usuario.senha),
         )
         usuario.id = cur.lastrowid
         row = conn.execute("SELECT * FROM usuarios WHERE id = ?", (usuario.id,)).fetchone()

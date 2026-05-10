@@ -1,9 +1,11 @@
 # Técnico Resolve
 
-Plataforma de suporte técnico sob demanda — Projeto Integrador LDAMD 2026/1.
+Plataforma de suporte técnico sob demanda que conecta clientes com problemas em dispositivos eletrônicos a técnicos especializados. O cliente abre um chamado, o técnico recebe a notificação em tempo real, aceita ou recusa o atendimento, e o cliente acompanha o status até a conclusão.
 
 **Aluno:** Carlos Figueiredo  
-**Disciplina:** Lab. de Desenvolvimento de Aplicações Móveis e Distribuídas — PUC Minas
+**Disciplina:** Lab. de Desenvolvimento de Aplicações Móveis e Distribuídas — PUC Minas  
+**Curso:** Engenharia de Software — 5º Período  
+**Semestre:** 1º Semestre 2026  
 
 ---
 
@@ -11,26 +13,69 @@ Plataforma de suporte técnico sob demanda — Projeto Integrador LDAMD 2026/1.
 
 ```
 repair-service-app/
-├── backend/          # Web Service REST (Flask + SQLite)
-├── docs/             # Diagramas e documentação
-└── README.md
+├── backend/                  # Web Service REST (Flask + SQLite)
+│   ├── app/
+│   │   ├── models/           # Entidades do domínio (Usuario, Chamado)
+│   │   ├── repositories/     # Acesso ao banco de dados (SQLite)
+│   │   ├── services/         # Regras de negócio
+│   │   └── routes/           # Endpoints REST (Blueprints Flask)
+│   ├── database/
+│   │   └── schema.sql        # Definição das tabelas
+│   ├── config.py
+│   ├── run.py
+│   └── requirements.txt
+└── docs/                     # Diagramas e documentação
+    ├── proposta-dominio.md
+    ├── arquitetura.md
+    ├── schema.md
+    └── tecnico-resolve.postman_collection.json
 ```
 
-## Sprint 1 — Backend REST
+---
+
+## Arquitetura do Sistema
+
+O sistema segue uma arquitetura orientada a eventos (EDA), com backend REST em Flask, banco de dados SQLite, middleware de mensagens RabbitMQ e aplicativos móveis em Flutter.
+
+![Diagrama de Arquitetura](docs/img/Diagrama%20da%20Arquitetura.png)
+
+> RabbitMQ e WebSocket são integrados na Sprint 2.
+
+---
+
+## Banco de Dados
+
+Banco SQLite com duas tabelas. O schema completo está em `backend/database/schema.sql`.
+
+![Diagrama Entidade-Relacionamento](docs/img/Diagrama%20Entidade-Relacionamento.png)
+
+## Como Executar (Sprint 1)
 
 ### Pré-requisitos
 
 - Python 3.11+
 
-### Como executar
+### Instalação e execução
 
 ```bash
 cd backend
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python run.py
 ```
 
-O servidor sobe em `http://localhost:5000`.
+O servidor sobe em `http://0.0.0.0:5000`.
+
+Para testar os endpoints, importe a coleção do Postman em `docs/tecnico-resolve.postman_collection.json`.
+
+---
+
+## Fluxo de Status do Chamado
+
+```
+ABERTO ──► ACEITO ──► EM_ANDAMENTO ──► CONCLUIDO
+       │        │
+       └────────┴──► RECUSADO
+```
 
 ---
 
@@ -39,6 +84,6 @@ O servidor sobe em `http://localhost:5000`.
 | Sprint | Foco | Prazo |
 |--------|------|-------|
 | 1 | Proposta + Backend REST | 11/05/2026 |
-| 2 | Integração MOM | 25/05/2026 |
+| 2 | Integração MOM (RabbitMQ) | 25/05/2026 |
 | 3 | App Flutter — Cliente | 15/06/2026 |
-| 4 | App Flutter — Prestador + Entrega Final | 03/07/2026 |
+| 4 | App Flutter — Técnico + Entrega Final | 03/07/2026 |

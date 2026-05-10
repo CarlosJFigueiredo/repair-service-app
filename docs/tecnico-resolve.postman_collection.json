@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:5000",
+      "value": "http://192.168.0.72:5000",
       "type": "string"
     }
   ],
@@ -24,9 +24,9 @@
             "url": { "raw": "{{base_url}}/api/usuarios/", "host": ["{{base_url}}"], "path": ["api", "usuarios", ""] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Ana Souza\",\n  \"email\": \"ana@email.com\",\n  \"telefone\": \"31999990001\",\n  \"perfil\": \"CLIENTE\"\n}"
+              "raw": "{\n  \"nome\": \"Ana Souza\",\n  \"email\": \"ana@email.com\",\n  \"telefone\": \"31999990001\",\n  \"perfil\": \"CLIENTE\",\n  \"senha\": \"123456\"\n}"
             },
-            "description": "Cadastra um novo usuário com perfil CLIENTE. Campos obrigatórios: nome, email, telefone, perfil."
+            "description": "Cadastra um novo usuário com perfil CLIENTE. Campos obrigatórios: nome, email, telefone, perfil, senha."
           },
           "response": [
             {
@@ -41,7 +41,7 @@
               "status": "Bad Request",
               "code": 400,
               "header": [{ "key": "Content-Type", "value": "application/json" }],
-              "body": "{\n  \"erro\": \"Campos obrigatórios ausentes: telefone\"\n}"
+              "body": "{\n  \"erro\": \"Campos obrigatórios ausentes: senha\"\n}"
             },
             {
               "name": "409 E-mail duplicado",
@@ -60,9 +60,9 @@
             "url": { "raw": "{{base_url}}/api/usuarios/", "host": ["{{base_url}}"], "path": ["api", "usuarios", ""] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Carlos Silva\",\n  \"email\": \"carlos@tecnico.com\",\n  \"telefone\": \"31999990002\",\n  \"perfil\": \"TECNICO\",\n  \"especialidade\": \"NOTEBOOK\"\n}"
+              "raw": "{\n  \"nome\": \"Carlos Silva\",\n  \"email\": \"carlos@tecnico.com\",\n  \"telefone\": \"31999990002\",\n  \"perfil\": \"TECNICO\",\n  \"especialidade\": \"NOTEBOOK\",\n  \"senha\": \"123456\"\n}"
             },
-            "description": "Cadastra um novo usuário com perfil TECNICO. Campo 'especialidade' é obrigatório para técnicos."
+            "description": "Cadastra um novo usuário com perfil TECNICO. Campos obrigatórios: nome, email, telefone, perfil, especialidade, senha."
           },
           "response": [
             {
@@ -82,11 +82,47 @@
           ]
         },
         {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/usuarios/login", "host": ["{{base_url}}"], "path": ["api", "usuarios", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ana@email.com\",\n  \"senha\": \"123456\"\n}"
+            },
+            "description": "Autentica um usuário (cliente ou técnico) com email e senha. Retorna os dados do usuário sem a senha."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"nome\": \"Ana Souza\",\n  \"email\": \"ana@email.com\",\n  \"telefone\": \"31999990001\",\n  \"perfil\": \"CLIENTE\",\n  \"especialidade\": null,\n  \"criado_em\": \"2026-05-06 10:00:00\"\n}"
+            },
+            {
+              "name": "401 Credenciais inválidas",
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"Credenciais inválidas\"\n}"
+            },
+            {
+              "name": "400 Campos ausentes",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"erro\": \"email e senha são obrigatórios\"\n}"
+            }
+          ]
+        },
+        {
           "name": "Listar Usuários",
           "request": {
             "method": "GET",
             "url": { "raw": "{{base_url}}/api/usuarios/", "host": ["{{base_url}}"], "path": ["api", "usuarios", ""] },
-            "description": "Retorna todos os usuários cadastrados (clientes e técnicos)."
+            "description": "Retorna todos os usuários cadastrados (clientes e técnicos). A senha nunca é retornada."
           },
           "response": [
             {
@@ -103,7 +139,7 @@
           "request": {
             "method": "GET",
             "url": { "raw": "{{base_url}}/api/usuarios/1", "host": ["{{base_url}}"], "path": ["api", "usuarios", "1"] },
-            "description": "Retorna os dados de um usuário específico pelo seu ID."
+            "description": "Retorna os dados de um usuário específico pelo seu ID. A senha nunca é retornada."
           },
           "response": [
             {

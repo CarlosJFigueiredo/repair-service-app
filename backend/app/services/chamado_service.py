@@ -1,6 +1,7 @@
 from app.models.chamado import Chamado
 from app.repositories import chamado_repository as repo
 from app.repositories import usuario_repository as usuario_repo
+from app.messaging.producer import publicar_evento
 
 TIPOS_VALIDOS = {"CELULAR", "NOTEBOOK", "INTERNET", "OUTRO"}
 
@@ -38,6 +39,13 @@ def abrir(dados: dict) -> tuple[dict, int]:
         atualizado_em=None,
     )
     criado = repo.criar(chamado)
+    publicar_evento("chamado.criado", {
+        "chamado_id": criado.id,
+        "cliente_id": criado.cliente_id,
+        "tipo_servico": criado.tipo_servico,
+        "descricao": criado.descricao,
+        "criado_em": criado.criado_em,
+    })
     return criado.to_dict(), 201
 
 
@@ -77,4 +85,11 @@ def atualizar_status(chamado_id: int, dados: dict) -> tuple[dict, int]:
             return {"erro": "Técnico não encontrado ou perfil inválido"}, 404
 
     atualizado = repo.atualizar_status(chamado_id, novo_status, tecnico_id)
+    publicar_evento("chamado.status_alterado", {
+        "chamado_id": atualizado.id,
+        "status_anterior": chamado.status,
+        "status_novo": atualizado.status,
+        "tecnico_id": atualizado.tecnico_id,
+        "atualizado_em": atualizado.atualizado_em,
+    })
     return atualizado.to_dict(), 200

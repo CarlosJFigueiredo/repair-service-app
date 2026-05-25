@@ -3,8 +3,8 @@ services:
     image: rabbitmq:3.13-management
     container_name: tecnico_resolve_rabbitmq
     ports:
-      - "5672:5672"   # AMQP (usado pelo pika)
-      - "15672:15672" # Management UI (http://localhost:15672)
+      - "5673:5672"   # AMQP (usado pelo pika)
+      - "15673:15672" # Management UI (http://localhost:15673)
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest

@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.usuario import Usuario
 from app.repositories import usuario_repository as repo
+from app.auth import gerar_token
 
 PERFIS_VALIDOS = {"CLIENTE", "TECNICO"}
 
@@ -42,7 +43,7 @@ def login(dados: dict) -> tuple[dict, int]:
     if not usuario or not check_password_hash(usuario.senha, dados["senha"]):
         return {"erro": "Credenciais inválidas"}, 401
 
-    return usuario.to_dict(), 200
+    return {"token": gerar_token(usuario), "usuario": usuario.to_dict()}, 200
 
 
 def listar() -> tuple[list, int]:

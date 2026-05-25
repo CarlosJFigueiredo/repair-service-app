@@ -13,8 +13,8 @@ TRANSICOES = {
 }
 
 
-def abrir(dados: dict) -> tuple[dict, int]:
-    campos = ["cliente_id", "tipo_servico", "descricao"]
+def abrir(dados: dict, cliente_id: int) -> tuple[dict, int]:
+    campos = ["tipo_servico", "descricao"]
     faltando = [c for c in campos if not dados.get(c)]
     if faltando:
         return {"erro": f"Campos obrigatórios ausentes: {', '.join(faltando)}"}, 400
@@ -22,15 +22,9 @@ def abrir(dados: dict) -> tuple[dict, int]:
     if dados["tipo_servico"] not in TIPOS_VALIDOS:
         return {"erro": f"tipo_servico deve ser um de: {', '.join(TIPOS_VALIDOS)}"}, 400
 
-    cliente = usuario_repo.buscar_por_id(dados["cliente_id"])
-    if not cliente:
-        return {"erro": "Cliente não encontrado"}, 404
-    if cliente.perfil != "CLIENTE":
-        return {"erro": "Apenas usuários com perfil CLIENTE podem abrir chamados"}, 403
-
     chamado = Chamado(
         id=None,
-        cliente_id=dados["cliente_id"],
+        cliente_id=cliente_id,
         tecnico_id=None,
         tipo_servico=dados["tipo_servico"],
         descricao=dados["descricao"],
@@ -49,7 +43,9 @@ def abrir(dados: dict) -> tuple[dict, int]:
     return criado.to_dict(), 201
 
 
-def listar(status: str = None) -> tuple[list, int]:
+def listar(status: str = None, cliente_id: int = None) -> tuple[list, int]:
+    if cliente_id is not None:
+        return [c.to_dict() for c in repo.listar_por_cliente(cliente_id)], 200
     return [c.to_dict() for c in repo.listar(status)], 200
 
 

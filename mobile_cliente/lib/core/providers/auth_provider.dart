@@ -49,8 +49,12 @@ class AuthProvider extends ChangeNotifier {
       _usuario = Usuario.fromJson(data['usuario'] as Map<String, dynamic>);
       return null;
     } on DioException catch (e) {
-      final msg = (e.response?.data as Map?)?['erro'] as String?;
-      _erro = msg ?? 'Erro ao fazer login';
+      if (e.response != null) {
+        final msg = (e.response!.data as Map?)?['erro'] as String?;
+        _erro = msg ?? 'Erro ${e.response!.statusCode}';
+      } else {
+        _erro = 'Sem conexão com o servidor (${e.message})';
+      }
       return _erro;
     } finally {
       _loading = false;
@@ -63,26 +67,33 @@ class AuthProvider extends ChangeNotifier {
     required String email,
     required String telefone,
     required String senha,
+    String perfil = 'CLIENTE',
+    String? especialidade,
   }) async {
     _loading = true;
     _erro = null;
     notifyListeners();
 
     try {
-      await ApiClient.instance.post(
-        ApiConstants.usuarios,
-        data: {
-          'nome': nome,
-          'email': email,
-          'telefone': telefone,
-          'senha': senha,
-          'perfil': 'CLIENTE',
-        },
-      );
+      final body = <String, dynamic>{
+        'nome': nome,
+        'email': email,
+        'telefone': telefone,
+        'senha': senha,
+        'perfil': perfil,
+        if (especialidade != null && especialidade.isNotEmpty)
+          'especialidade': especialidade,
+      };
+      await ApiClient.instance.post(ApiConstants.usuarios, data: body);
       return null;
     } on DioException catch (e) {
-      final msg = (e.response?.data as Map?)?['erro'] as String?;
-      _erro = msg ?? 'Erro ao cadastrar';
+      if (e.response != null) {
+        final data = e.response!.data;
+        final msg = data is Map ? data['erro'] as String? : null;
+        _erro = msg ?? 'Erro ${e.response!.statusCode}';
+      } else {
+        _erro = 'Sem conexão com o servidor (${e.message})';
+      }
       return _erro;
     } finally {
       _loading = false;

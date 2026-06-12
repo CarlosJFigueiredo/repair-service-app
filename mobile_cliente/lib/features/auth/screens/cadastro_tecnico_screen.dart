@@ -5,18 +5,19 @@ import '../../../app/routes.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../shared/theme/app_theme.dart';
 
-class CadastroScreen extends StatefulWidget {
-  const CadastroScreen({super.key});
+class CadastroTecnicoScreen extends StatefulWidget {
+  const CadastroTecnicoScreen({super.key});
 
   @override
-  State<CadastroScreen> createState() => _CadastroScreenState();
+  State<CadastroTecnicoScreen> createState() => _CadastroTecnicoScreenState();
 }
 
-class _CadastroScreenState extends State<CadastroScreen> {
+class _CadastroTecnicoScreenState extends State<CadastroTecnicoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nomeCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _telefoneCtrl = TextEditingController();
+  final _especialidadeCtrl = TextEditingController();
   final _senhaCtrl = TextEditingController();
   final _confirmarSenhaCtrl = TextEditingController();
   bool _senhaVisivel = false;
@@ -27,6 +28,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
     _nomeCtrl.dispose();
     _emailCtrl.dispose();
     _telefoneCtrl.dispose();
+    _especialidadeCtrl.dispose();
     _senhaCtrl.dispose();
     _confirmarSenhaCtrl.dispose();
     super.dispose();
@@ -40,7 +42,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
       email: _emailCtrl.text.trim(),
       telefone: _telefoneCtrl.text.trim(),
       senha: _senhaCtrl.text,
-      perfil: 'CLIENTE',
+      perfil: 'TECNICO',
+      especialidade: _especialidadeCtrl.text.trim(),
     );
     if (!mounted) return;
     if (erro != null) {
@@ -64,7 +67,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Criar conta')),
+      appBar: AppBar(title: const Text('Cadastro de Técnico')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -114,6 +117,20 @@ class _CadastroScreenState extends State<CadastroScreen> {
                     if (v.replaceAll(RegExp(r'\D'), '').length < 10) {
                       return 'Telefone inválido';
                     }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _especialidadeCtrl,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    labelText: 'Especialidade',
+                    prefixIcon: Icon(Icons.engineering_outlined),
+                    hintText: 'Ex: Eletrônica, Informática, Eletrodomésticos...',
+                  ),
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) return 'Informe sua especialidade';
                     return null;
                   },
                 ),

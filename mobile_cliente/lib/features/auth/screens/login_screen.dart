@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Text('Não tem conta?', style: TextStyle(color: AppColors.textSecondary)),
                       TextButton(
-                        onPressed: () => Navigator.pushNamed(context, AppRoutes.cadastro),
+                        onPressed: () => Navigator.pushNamed(context, AppRoutes.selecaoTipo),
                         child: const Text('Cadastre-se'),
                       ),
                     ],

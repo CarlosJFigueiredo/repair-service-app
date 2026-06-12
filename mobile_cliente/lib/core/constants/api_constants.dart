@@ -4,5 +4,5 @@ class ApiConstants {
 
   static const login = '/api/usuarios/login';
   static const usuarios = '/api/usuarios/';
-  static const chamados = '/api/chamados';
+  static const chamados = '/api/chamados/';
 }

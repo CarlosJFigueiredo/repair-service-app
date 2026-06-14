@@ -1,5 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../core/providers/chamado_provider.dart';
 import '../../chamados/screens/lista_chamados_screen.dart';
 import '../../historico/screens/historico_screen.dart';
 import '../../alertas/screens/alertas_screen.dart';
@@ -14,6 +18,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  Timer? _pollingTimer;
+
+  static const _intervaloPolling = Duration(seconds: 10);
 
   final List<Widget> _screens = const [
     ListaChamadosScreen(),
@@ -21,6 +28,25 @@ class _HomeScreenState extends State<HomeScreen> {
     AlertasScreen(),
     PerfilScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Carga inicial
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ChamadoProvider>().listar();
+    });
+    // Polling periódico para refletir atualizações do servidor automaticamente
+    _pollingTimer = Timer.periodic(_intervaloPolling, (_) {
+      if (mounted) context.read<ChamadoProvider>().listar();
+    });
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

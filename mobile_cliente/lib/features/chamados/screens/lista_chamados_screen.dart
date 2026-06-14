@@ -15,14 +15,6 @@ class ListaChamadosScreen extends StatefulWidget {
 
 class _ListaChamadosScreenState extends State<ListaChamadosScreen> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChamadoProvider>().listar();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final provider = context.watch<ChamadoProvider>();
     final ativos = provider.ativos;

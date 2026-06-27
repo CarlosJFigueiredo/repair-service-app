@@ -74,6 +74,19 @@ class ChamadoProvider extends ChangeNotifier {
     }
   }
 
+  Future<String?> atualizarStatus(int id, String novoStatus) async {
+    try {
+      await ApiClient.instance.patch(
+        '${ApiConstants.chamados}$id/status',
+        data: {'status': novoStatus},
+      );
+      await listar();
+      return null;
+    } on DioException catch (e) {
+      return _parseError(e, 'Erro ao atualizar status');
+    }
+  }
+
   String _parseError(DioException e, String fallback) {
     if (e.response != null) {
       final data = e.response!.data;

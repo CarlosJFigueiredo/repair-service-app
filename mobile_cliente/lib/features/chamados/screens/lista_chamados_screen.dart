@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../app/routes.dart';
+import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/chamado_provider.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../models/chamado.dart';
@@ -17,12 +18,14 @@ class _ListaChamadosScreenState extends State<ListaChamadosScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ChamadoProvider>();
+    final isTecnico =
+        context.watch<AuthProvider>().usuario?.perfil == 'TECNICO';
     final ativos = provider.ativos;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Meus Chamados'),
+        title: Text(isTecnico ? 'Chamados' : 'Meus Chamados'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -30,22 +33,24 @@ class _ListaChamadosScreenState extends State<ListaChamadosScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final provider = context.read<ChamadoProvider>();
-          await Navigator.pushNamed(context, AppRoutes.abrirChamado);
-          if (mounted) provider.listar();
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Novo chamado'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: _buildBody(provider, ativos),
+      floatingActionButton: isTecnico
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () async {
+                final p = context.read<ChamadoProvider>();
+                await Navigator.pushNamed(context, AppRoutes.abrirChamado);
+                if (mounted) p.listar();
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Novo chamado'),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+      body: _buildBody(provider, ativos, isTecnico),
     );
   }
 
-  Widget _buildBody(ChamadoProvider provider, List<Chamado> ativos) {
+  Widget _buildBody(ChamadoProvider provider, List<Chamado> ativos, bool isTecnico) {
     if (provider.loading && ativos.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -56,10 +61,12 @@ class _ListaChamadosScreenState extends State<ListaChamadosScreen> {
       );
     }
     if (ativos.isEmpty) {
-      return const _VazioView(
+      return _VazioView(
         icone: Icons.check_circle_outline,
         mensagem: 'Nenhum chamado ativo',
-        sub: 'Toque em "Novo chamado" para abrir um.',
+        sub: isTecnico
+            ? 'Nenhum chamado disponível no momento.'
+            : 'Toque em "Novo chamado" para abrir um.',
       );
     }
     return RefreshIndicator(

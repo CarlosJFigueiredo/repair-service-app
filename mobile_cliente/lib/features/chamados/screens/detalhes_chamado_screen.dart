@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/chamado_provider.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../models/chamado.dart';
@@ -57,6 +58,19 @@ class _DetalhesChamadoScreenState extends State<DetalhesChamadoScreen> {
     );
   }
 
+  Future<void> _atualizarStatus(String novoStatus) async {
+    final erro = await context
+        .read<ChamadoProvider>()
+        .atualizarStatus(widget.chamadoId, novoStatus);
+    if (!mounted) return;
+    if (erro != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(erro)));
+    } else {
+      await _carregar();
+    }
+  }
+
   Widget _buildBody() {
     if (_loading) return const Center(child: CircularProgressIndicator());
     if (_erro != null) {
@@ -77,6 +91,9 @@ class _DetalhesChamadoScreenState extends State<DetalhesChamadoScreen> {
     }
 
     final c = _chamado!;
+    final user = context.read<AuthProvider>().usuario;
+    final isTecnico = user?.perfil == 'TECNICO';
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -85,6 +102,14 @@ class _DetalhesChamadoScreenState extends State<DetalhesChamadoScreen> {
           _InfoCard(chamado: c),
           const SizedBox(height: 16),
           _TimelineCard(chamado: c),
+          if (isTecnico && !c.isFinalizado) ...[
+            const SizedBox(height: 16),
+            _AcoesTecnicoCard(
+              chamado: c,
+              userId: user!.id,
+              onAtualizar: _atualizarStatus,
+            ),
+          ],
         ],
       ),
     );
@@ -339,6 +364,148 @@ class _TimelineItem extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AcoesTecnicoCard extends StatefulWidget {
+  final Chamado chamado;
+  final int userId;
+  final Future<void> Function(String) onAtualizar;
+
+  const _AcoesTecnicoCard({
+    required this.chamado,
+    required this.userId,
+    required this.onAtualizar,
+  });
+
+  @override
+  State<_AcoesTecnicoCard> createState() => _AcoesTecnicoCardState();
+}
+
+class _AcoesTecnicoCardState extends State<_AcoesTecnicoCard> {
+  bool _atualizando = false;
+
+  Future<void> _executar(String novoStatus) async {
+    setState(() => _atualizando = true);
+    await widget.onAtualizar(novoStatus);
+    if (mounted) setState(() => _atualizando = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = widget.chamado;
+    final isResponsavel = c.tecnicoId == widget.userId;
+
+    List<Widget> botoes = [];
+
+    if (c.isAberto) {
+      botoes = [
+        _BotaoAcao(
+          label: 'Aceitar Chamado',
+          icone: Icons.check_circle_outline,
+          cor: AppColors.statusAceito,
+          onTap: _atualizando ? null : () => _executar('ACEITO'),
+        ),
+        const SizedBox(height: 10),
+        _BotaoAcao(
+          label: 'Recusar',
+          icone: Icons.cancel_outlined,
+          cor: AppColors.statusRecusado,
+          outlined: true,
+          onTap: _atualizando ? null : () => _executar('RECUSADO'),
+        ),
+      ];
+    } else if (c.isAceito && isResponsavel) {
+      botoes = [
+        _BotaoAcao(
+          label: 'Iniciar Atendimento',
+          icone: Icons.engineering,
+          cor: AppColors.statusAndamento,
+          onTap: _atualizando ? null : () => _executar('EM_ANDAMENTO'),
+        ),
+      ];
+    } else if (c.isEmAndamento && isResponsavel) {
+      botoes = [
+        _BotaoAcao(
+          label: 'Concluir Chamado',
+          icone: Icons.task_alt,
+          cor: AppColors.statusConcluido,
+          onTap: _atualizando ? null : () => _executar('CONCLUIDO'),
+        ),
+      ];
+    }
+
+    if (botoes.isEmpty) return const SizedBox.shrink();
+
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Ações',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (_atualizando)
+              const Center(child: CircularProgressIndicator())
+            else
+              ...botoes,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BotaoAcao extends StatelessWidget {
+  final String label;
+  final IconData icone;
+  final Color cor;
+  final VoidCallback? onTap;
+  final bool outlined;
+
+  const _BotaoAcao({
+    required this.label,
+    required this.icone,
+    required this.cor,
+    this.onTap,
+    this.outlined = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (outlined) {
+      return OutlinedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icone, color: cor),
+        label: Text(label, style: TextStyle(color: cor)),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: cor),
+          minimumSize: const Size(double.infinity, 48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
+    return ElevatedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icone),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: cor,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 48),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+      ),
     );
   }
 }

@@ -13,21 +13,31 @@ Plataforma de suporte técnico sob demanda que conecta clientes com problemas em
 
 ```
 repair-service-app/
-├── backend/                  # Web Service REST (Flask + SQLite)
+├── backend/                  # Web Service REST (Flask + SQLite + RabbitMQ)
 │   ├── app/
 │   │   ├── models/           # Entidades do domínio (Usuario, Chamado)
 │   │   ├── repositories/     # Acesso ao banco de dados (SQLite)
-│   │   ├── services/         # Regras de negócio
-│   │   └── routes/           # Endpoints REST (Blueprints Flask)
+│   │   ├── services/         # Regras de negócio + publicação de eventos MOM
+│   │   ├── routes/           # Endpoints REST (Blueprints Flask)
+│   │   └── messaging/        # Producer e Consumer RabbitMQ (pika)
 │   ├── database/
 │   │   └── schema.sql        # Definição das tabelas
 │   ├── config.py
-│   ├── run.py
+│   ├── run.py                # Servidor Flask
+│   ├── consumer_runner.py    # Consumer MOM (processo independente)
 │   └── requirements.txt
-└── docs/                     # Diagramas e documentação
-    ├── proposta-dominio.md
-    ├── arquitetura.md
-    ├── schema.md
+├── mobile_cliente/           # App Flutter (perfis Cliente e Técnico)
+│   ├── lib/
+│   │   ├── features/         # auth, chamados, historico, alertas, perfil, home
+│   │   └── core/             # providers, services, constants
+│   └── ARQUITETURA.md        # Documentação da Clean Architecture do app
+├── docker-compose.yml        # RabbitMQ 3.13 + Management UI
+└── docs/                     # Documentação e mídia
+    ├── Relatorio_Tecnico_Final.md          # Relatório técnico da Sprint 4
+    ├── Integracao_MOM.md                   # Detalhes da integração RabbitMQ
+    ├── video/
+    │   ├── sprint-3.mp4                    # Screencast Sprint 3
+    │   └── sprint-4.mp4                    # Screencast Sprint 4 (fluxo completo)
     └── tecnico-resolve.postman_collection.json
 ```
 
@@ -49,13 +59,23 @@ Banco SQLite com duas tabelas. O schema completo está em `backend/database/sche
 
 ![Diagrama Entidade-Relacionamento](docs/img/Diagrama%20Entidade-Relacionamento.png)
 
-## Como Executar (Sprint 1)
+## Como Executar
 
 ### Pré-requisitos
 
 - Python 3.11+
+- Flutter 3.x
+- Docker (para o RabbitMQ)
 
-### Instalação e execução
+### 1. RabbitMQ (MOM)
+
+```bash
+docker-compose up -d
+```
+
+Management UI disponível em `http://localhost:15672` (guest / guest).
+
+### 2. Backend Flask
 
 ```bash
 cd backend
@@ -65,7 +85,24 @@ python run.py
 
 O servidor sobe em `http://0.0.0.0:5000`.
 
-Para testar os endpoints, importe a coleção do Postman em `docs/tecnico-resolve.postman_collection.json`.
+Em um segundo terminal, inicie o consumer MOM:
+
+```bash
+cd backend
+python consumer_runner.py
+```
+
+### 3. App Flutter
+
+```bash
+cd mobile_cliente
+flutter pub get
+flutter run
+```
+
+O app detecta o perfil automaticamente no login (`CLIENTE` ou `TECNICO`).
+
+Para testar os endpoints diretamente, importe a coleção do Postman em `docs/tecnico-resolve.postman_collection.json`.
 
 ---
 

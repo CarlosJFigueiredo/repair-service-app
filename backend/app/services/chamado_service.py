@@ -43,9 +43,11 @@ def abrir(dados: dict, cliente_id: int) -> tuple[dict, int]:
     return criado.to_dict(), 201
 
 
-def listar(status: str = None, cliente_id: int = None) -> tuple[list, int]:
+def listar(status: str = None, cliente_id: int = None, tecnico_id: int = None) -> tuple[list, int]:
     if cliente_id is not None:
         return [c.to_dict() for c in repo.listar_por_cliente(cliente_id)], 200
+    if tecnico_id is not None:
+        return [c.to_dict() for c in repo.listar_por_tecnico(tecnico_id)], 200
     return [c.to_dict() for c in repo.listar(status)], 200
 
 

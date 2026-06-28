@@ -74,11 +74,13 @@ class ChamadoProvider extends ChangeNotifier {
     }
   }
 
-  Future<String?> atualizarStatus(int id, String novoStatus) async {
+  Future<String?> atualizarStatus(int id, String novoStatus, {int? tecnicoId}) async {
     try {
+      final data = <String, dynamic>{'status': novoStatus};
+      if (tecnicoId != null) data['tecnico_id'] = tecnicoId;
       await ApiClient.instance.patch(
         '${ApiConstants.chamados}$id/status',
-        data: {'status': novoStatus},
+        data: data,
       );
       await listar();
       return null;

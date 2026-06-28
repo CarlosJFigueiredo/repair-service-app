@@ -21,8 +21,7 @@ def listar():
     if logado["perfil"] == "CLIENTE":
         resultado, status = service.listar(cliente_id=int(logado["sub"]))
     else:
-        status_filtro = request.args.get("status")
-        resultado, status = service.listar(status_filtro)
+        resultado, status = service.listar(tecnico_id=int(logado["sub"]))
     return jsonify(resultado), status
 
 

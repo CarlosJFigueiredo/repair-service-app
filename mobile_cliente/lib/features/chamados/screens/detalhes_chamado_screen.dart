@@ -58,10 +58,10 @@ class _DetalhesChamadoScreenState extends State<DetalhesChamadoScreen> {
     );
   }
 
-  Future<void> _atualizarStatus(String novoStatus) async {
+  Future<void> _atualizarStatus(String novoStatus, {int? tecnicoId}) async {
     final erro = await context
         .read<ChamadoProvider>()
-        .atualizarStatus(widget.chamadoId, novoStatus);
+        .atualizarStatus(widget.chamadoId, novoStatus, tecnicoId: tecnicoId);
     if (!mounted) return;
     if (erro != null) {
       ScaffoldMessenger.of(context)
@@ -371,7 +371,7 @@ class _TimelineItem extends StatelessWidget {
 class _AcoesTecnicoCard extends StatefulWidget {
   final Chamado chamado;
   final int userId;
-  final Future<void> Function(String) onAtualizar;
+  final Future<void> Function(String, {int? tecnicoId}) onAtualizar;
 
   const _AcoesTecnicoCard({
     required this.chamado,
@@ -386,9 +386,9 @@ class _AcoesTecnicoCard extends StatefulWidget {
 class _AcoesTecnicoCardState extends State<_AcoesTecnicoCard> {
   bool _atualizando = false;
 
-  Future<void> _executar(String novoStatus) async {
+  Future<void> _executar(String novoStatus, {int? tecnicoId}) async {
     setState(() => _atualizando = true);
-    await widget.onAtualizar(novoStatus);
+    await widget.onAtualizar(novoStatus, tecnicoId: tecnicoId);
     if (mounted) setState(() => _atualizando = false);
   }
 
@@ -405,7 +405,7 @@ class _AcoesTecnicoCardState extends State<_AcoesTecnicoCard> {
           label: 'Aceitar Chamado',
           icone: Icons.check_circle_outline,
           cor: AppColors.statusAceito,
-          onTap: _atualizando ? null : () => _executar('ACEITO'),
+          onTap: _atualizando ? null : () => _executar('ACEITO', tecnicoId: widget.userId),
         ),
         const SizedBox(height: 10),
         _BotaoAcao(

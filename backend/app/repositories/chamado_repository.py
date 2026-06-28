@@ -55,6 +55,19 @@ def listar_por_cliente(cliente_id: int) -> list[Chamado]:
         return [_row_to_chamado(r) for r in rows]
 
 
+def listar_por_tecnico(tecnico_id: int) -> list[Chamado]:
+    with _conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT * FROM chamados
+            WHERE status = 'ABERTO' OR tecnico_id = ?
+            ORDER BY id
+            """,
+            (tecnico_id,),
+        ).fetchall()
+        return [_row_to_chamado(r) for r in rows]
+
+
 def buscar_por_id(chamado_id: int) -> Optional[Chamado]:
     with _conn() as conn:
         row = conn.execute("SELECT * FROM chamados WHERE id = ?", (chamado_id,)).fetchone()
